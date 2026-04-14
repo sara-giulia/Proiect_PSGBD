@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultație Nouă</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #2c7be5; color: white;
+            padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold;
+        }
+        .navbar a { color: white; text-decoration: none; margin-right: 1rem; font-size: 0.9rem; }
+        .container { max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+        .card {
+            background: white; border-radius: 12px;
+            padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;
+        }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        h3 { color: #2c7be5; margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.3rem; color: #555; font-size: 0.9rem; }
+        select, input[type=text] {
+            width: 100%; padding: 0.6rem; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 1rem; margin-bottom: 1rem;
+        }
+        button {
+            background: #2c7be5; color: white; border: none;
+            padding: 0.7rem 2rem; border-radius: 8px;
+            font-size: 1rem; cursor: pointer; width: 100%;
+        }
+        button:hover { background: #1a5cbf; }
+        .alert-error {
+            background: #fdecea; border-left: 4px solid #e53935;
+            padding: 1rem; border-radius: 8px; color: #b71c1c; margin-bottom: 1rem;
+        }
+        .alert-success {
+            background: #e8f5e9; border-left: 4px solid #43a047;
+            padding: 1rem; border-radius: 8px; color: #1b5e20; margin-bottom: 1rem;
+        }
+        .badge {
+            display: inline-block; padding: 0.3rem 0.8rem;
+            border-radius: 20px; font-size: 0.85rem; font-weight: bold;
+        }
+        .badge-1 { background: #e8f5e9; color: #2e7d32; }
+        .badge-2 { background: #fff8e1; color: #f57f17; }
+        .badge-3 { background: #fdecea; color: #c62828; }
+        .questions { margin-top: 1rem; }
+        .question-item {
+            background: #f8f9fa; border-radius: 8px;
+            padding: 0.7rem 1rem; margin-bottom: 0.5rem; color: #333;
+        }
+        .btn-secondary {
+            background: #6c757d; margin-top: 0.5rem;
+        }
+        .btn-secondary:hover { background: #545b62; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    Sistem de Telemedicină
+    <a href="/"> Dashboard</a>
+</div>
+
+<div class="container">
+    <h2>Consultație Nouă</h2>
+
+    <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card" th:if="${success}">
+        <h3>Fișă medicală generată</h3>
+        <p><strong>ID Fișă:</strong> <span th:text="${formId}"></span></p>
+        <p style="margin: 0.5rem 0"><strong>Diagnostic provizoriu:</strong></p>
+        <p th:text="${diagnosis}" style="color: #555; margin-bottom: 1rem;"></p>
+
+        <p><strong>Nivel complexitate:</strong>
+            <span class="badge"
+                  th:classappend="${complexity == 1 ? 'badge-1' : (complexity == 2 ? 'badge-2' : 'badge-3')}"
+                  th:text="${complexity == 1 ? 'Simplu' : (complexity == 2 ? 'Mediu' : 'Urgent')}">
+            </span>
+        </p>
+
+        <div class="questions" th:if="${extraQuestions}">
+            <p style="margin: 1rem 0 0.5rem"><strong>Întrebări suplimentare:</strong></p>
+            <div th:each="q : ${#strings.arraySplit(extraQuestions, '|')}">
+                <div class="question-item" th:text="${#strings.trim(q)}"></div>
+            </div>
+        </div>
+
+        <form th:action="@{/consultatie/programeaza}" method="post" style="margin-top: 1.5rem">
+            <input type="hidden" name="formId" th:value="${formId}"/>
+            <input type="hidden" name="complexity" th:value="${complexity}"/>
+            <button type="submit">Programează consultație</button>
+        </form>
+    </div>
+
+    <div class="card" th:if="${programat}">
+        <h3>Consultație programată cu succes!</h3>
+        <p><strong>ID Consultație:</strong> <span th:text="${consultationId}"></span></p>
+        <p><strong>Doctor ID:</strong> <span th:text="${doctorId}"></span></p>
+        <p><strong>Data și ora:</strong> <span th:text="${scheduledAt}"></span></p>
+        <a href="/consultatie/noua">
+            <button class="btn-secondary" style="margin-top:1rem">+ Consultație nouă</button>
+        </a>
+    </div>
+
+    <div class="card" th:if="${!#bools.isTrue(success) and !#bools.isTrue(programat)}">
+        <h3>Introduceți simptomele</h3>
+        <form th:action="@{/consultatie/proceseaza}" method="post">
+            <label>Pacient</label>
+            <select name="patientId" required>
+                <option value="">-- Selectați pacientul --</option>
+                <option th:each="p : ${pacienti}"
+                        th:value="${p.id}"
+                        th:text="${p.last_name} + ' ' + ${p.first_name}">
+                </option>
+            </select>
+
+            <label>Simptom 1</label>
+            <input type="text" name="symptom1" placeholder="ex: febra" required/>
+
+            <label>Simptom 2</label>
+            <input type="text" name="symptom2" placeholder="ex: durere de cap" required/>
+
+            <label>Simptom 3</label>
+            <input type="text" name="symptom3" placeholder="ex: tuse" required/>
+
+            <button type="submit">Generează fișă medicală</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

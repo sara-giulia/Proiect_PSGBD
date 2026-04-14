@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>TeleMed - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #2c7be5;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .container { max-width: 900px; margin: 3rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 2rem; }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .card h3 { font-size: 1.1rem; color: #2c7be5; }
+    </style>
+</head>
+<body>
+<div class="navbar">Sistem de Telemedicină</div>
+<div class="container">
+    <h2>Dashboard</h2>
+    <div class="cards">
+        <a href="/pacienti" class="card">
+            <h3>Pacienți</h3>
+            <p>Gestionează pacienții înregistrați</p>
+        </a>
+        <a href="/fise" class="card">
+            <h3>Fișe Medicale</h3>
+            <p>Vizualizează fișele generate</p>
+        </a>
+        <a href="/consultatie/noua" class="card">
+            <h3>Consultație Nouă</h3>
+            <p>Inițiază o evaluare medicală</p>
+        </a>
+    </div>
+</div>
+</body>
+</html>

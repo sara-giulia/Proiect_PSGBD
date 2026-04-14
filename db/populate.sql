@@ -80,12 +80,21 @@ DECLARE
  
 BEGIN 
     INSERT INTO DOCTOR (first_name, last_name, specialization, schedule_start, schedule_end) VALUES
-        ('Andrei', 'Popescu', 'Medicina generala', '08:00', '13:00'),
-        ('Maria', 'Ionescu', 'Pediatrie', '11:00', '17:00'),
-        ('Cristian', 'Gheorghe', 'Cardiologie', '14:00', '19:00'),
-        ('Elena', 'Constantin', 'Neurologie', '08:00', '14:00'),
-        ('Bogdan', 'Rusu', 'Dermatologie', '10:00', '16:00'),
-        ('Ioana', 'Matei', 'Gastroenterologie', '13:00', '19:00');
+    ('Andrei','Popescu', 'Medicina generala', '08:00', '13:00'),
+    ('Maria', 'Ionescu', 'Pediatrie', '11:00', '17:00'),
+    ('Cristian', 'Gheorghe', 'Cardiologie', '14:00', '19:00'),
+    ('Elena', 'Constantin', 'Neurologie', '08:00', '14:00'),
+    ('Bogdan', 'Rusu', 'Dermatologie', '10:00', '16:00'),
+    ('Ioana', 'Matei', 'Gastroenterologie', '13:00', '19:00'),
+    ('Mihai', 'Dinu', 'Medicina generala', '07:00', '12:00'),
+    ('Raluca', 'Stoica', 'Pediatrie', '09:00', '15:00'),
+    ('Tudor', 'Marin', 'Cardiologie', '15:00', '20:00'),
+    ('Simona', 'Vlad', 'Neurologie', '12:00', '18:00'),
+    ('Catalin', 'Oprea', 'Dermatologie', '08:00', '14:00'),
+    ('Andreea', 'Lungu', 'Gastroenterologie', '10:00', '17:00'),
+    ('Dan', 'Chiriac', 'Medicina generala', '06:00', '12:00'),
+    ('Gabriela', 'Serban', 'Oncologie', '09:00', '16:00'),
+    ('Razvan', 'Moldovan', 'Ortopedie', '13:00', '20:00');
 
     v_counter := 0;
     FOR v_i IN 1..20 LOOP
@@ -131,22 +140,15 @@ BEGIN
     END LOOP;
  
     FOR v_patient_id IN (SELECT id FROM PATIENT ORDER BY id) LOOP
+        INSERT INTO CHRONIC_CONDITION (patient_id, name, diagnosed_date)
+        VALUES (v_patient_id, lista_conditii_cronice[FLOOR(RANDOM() * array_length(lista_conditii_cronice, 1)) + 1],
+            CURRENT_DATE - FLOOR(RANDOM() * 365 * 5)::INT);
  
-        IF RANDOM() > 0.5 THEN
-            v_type := 'lunar';
-            v_start_date := CURRENT_DATE - FLOOR(RANDOM() * 60)::INT;
-            v_end_date   := v_start_date + 30;
-        ELSE
-            v_type := 'anual';
-            v_start_date := CURRENT_DATE - FLOOR(RANDOM() * 200)::INT;
-            v_end_date   := v_start_date + 365;
+        IF RANDOM() > 0.7 THEN
+            INSERT INTO CHRONIC_CONDITION (patient_id, name, diagnosed_date)
+            VALUES (v_patient_id, lista_conditii_cronice[FLOOR(RANDOM() * array_length(lista_conditii_cronice, 1)) + 1],
+                CURRENT_DATE - FLOOR(RANDOM() * 365 * 3)::INT);
         END IF;
- 
-        INSERT INTO SUBSCRIPTION (patient_id, type, start_date, end_date, cost, status)
-        VALUES (v_patient_id, v_type, v_start_date, v_end_date,
-            CASE v_type WHEN 'lunar' THEN 49.99 ELSE 499.99 END,
-            CASE WHEN v_end_date >= CURRENT_DATE THEN 'activ' ELSE 'expirat' END);
- 
     END LOOP;
  
     FOR v_sub_id IN (SELECT id FROM SUBSCRIPTION ORDER BY id) LOOP
