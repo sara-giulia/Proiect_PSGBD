@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pacienți</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #2c7be5; color: white;
+            padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold;
+        }
+        .navbar a { color: white; text-decoration: none; margin-right: 1rem; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; background: white;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        th { background: #2c7be5; color: white; padding: 0.8rem 1rem; text-align: left; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid #f0f4f8; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8faff; }
+        .badge {
+            padding: 0.2rem 0.6rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: bold;
+        }
+        .activ { background: #e8f5e9; color: #2e7d32; }
+        .expirat { background: #fdecea; color: #c62828; }
+        .fara { background: #f5f5f5; color: #757575; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    🏥 Sistem de Telemedicină
+    <a href="/">← Dashboard</a>
+</div>
+
+<div class="container">
+    <h2>👥 Pacienți înregistrați</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Vârstă</th>
+            <th>Tip</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Abonament</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${pacienti}">
+            <td th:text="${p.id}"></td>
+            <td th:text="${p.last_name} + ' ' + ${p.first_name}"></td>
+            <td th:text="${p.varsta} + ' ani'"></td>
+            <td th:text="${p.tip}"></td>
+            <td th:text="${p.email}"></td>
+            <td th:text="${p.phone_number}"></td>
+            <td>
+                    <span class="badge"
+                          th:classappend="${p.abonament == 'activ'} ? 'activ' : (${p.abonament == 'expirat'} ? 'expirat' : 'fara')"
+                          th:text="${p.abonament}">
+                    </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

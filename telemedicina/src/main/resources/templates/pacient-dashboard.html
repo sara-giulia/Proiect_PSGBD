@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Pacient</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #2c7be5; color: white;
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar-brand { font-size: 1.2rem; font-weight: bold; }
+        .navbar-user { font-size: 0.9rem; }
+        .navbar a { color: white; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .card {
+            background: white; border-radius: 12px;
+            padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card h3 { color: #2c7be5; margin-bottom: 1rem; font-size: 1rem; }
+        .badge {
+            display: inline-block; padding: 0.3rem 0.8rem;
+            border-radius: 20px; font-size: 0.82rem; font-weight: bold;
+        }
+        .activ { background: #e8f5e9; color: #2e7d32; }
+        .expirat { background: #fdecea; color: #c62828; }
+        .risc-scazut { background: #e8f5e9; color: #2e7d32; }
+        .risc-mediu { background: #fff8e1; color: #f57f17; }
+        .risc-ridicat { background: #fdecea; color: #c62828; }
+        .alert-warning {
+            background: #fff8e1; border-left: 4px solid #f9a825;
+            padding: 0.8rem; border-radius: 8px; color: #e65100;
+            margin-bottom: 1rem; font-size: 0.9rem;
+        }
+        .btn {
+            display: inline-block; padding: 0.7rem 1.5rem;
+            background: #2c7be5; color: white; border-radius: 8px;
+            text-decoration: none; font-size: 0.9rem; margin-top: 1rem;
+            border: none; cursor: pointer;
+        }
+        .btn:hover { background: #1a5cbf; }
+        .btn-outline {
+            background: white; color: #2c7be5;
+            border: 2px solid #2c7be5;
+        }
+        .btn-outline:hover { background: #e8f0fc; }
+        table { width: 100%; border-collapse: collapse; }
+        th { color: #888; font-size: 0.8rem; text-align: left; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+        td { padding: 0.6rem 0; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+        .c1 { background: #e8f5e9; color: #2e7d32; }
+        .c2 { background: #fff8e1; color: #f57f17; }
+        .c3 { background: #fdecea; color: #c62828; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .info-label { color: #888; }
+        .scor-mare { font-size: 2rem; font-weight: bold; text-align: center; margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-brand">TeleMed</div>
+    <div class="navbar-user">
+        <span th:text="${userName}"></span>
+        <a href="/pacient/istoric">Istoric</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 th:text="'Bună ziua, ' + ${userName} + '!'"></h2>
+
+    <div class="alert-warning"
+         th:if="${abonament != null && abonament.zile_ramase != null && abonament.zile_ramase <= 7}">
+        Abonamentul tău expiră în
+        <strong th:text="${abonament.zile_ramase} + ' zile'"></strong>!
+        Reînnoiește-l pentru a continua să accesezi serviciile de telemedicină.
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Abonamentul meu</h3>
+            <div th:if="${abonament != null}">
+                <div class="info-row">
+                    <span class="info-label">Tip</span>
+                    <span th:text="${abonament.type}"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Valabil până la</span>
+                    <span th:text="${abonament.end_date}"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="badge"
+                          th:classappend="${abonament.status == 'activ'} ? 'activ' : 'expirat'"
+                          th:text="${abonament.status}">
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Zile rămase</span>
+                    <span th:text="${abonament.zile_ramase}"></span>
+                </div>
+            </div>
+            <div th:if="${abonament == null}">
+                <p style="color:#888">Nu ai un abonament activ.</p>
+            </div>
+        </div>
+
+        <div class="card" th:if="${scorRisc != null}">
+            <h3>Scor de risc</h3>
+            <div class="scor-mare"
+                 th:classappend="${scorRisc.nivel_risc == 'RISC SCAZUT'} ? 'risc-scazut' :
+                                 (${scorRisc.nivel_risc == 'RISC MEDIU'} ? 'risc-mediu' : 'risc-ridicat')"
+                 th:text="${scorRisc.scor}">
+            </div>
+            <p style="text-align:center; margin-bottom:0.5rem">
+                <span class="badge"
+                      th:classappend="${scorRisc.nivel_risc == 'RISC SCAZUT'} ? 'risc-scazut' :
+                                      (${scorRisc.nivel_risc == 'RISC MEDIU'} ? 'risc-mediu' : 'risc-ridicat')"
+                      th:text="${scorRisc.nivel_risc}">
+                </span>
+            </p>
+            <p style="font-size:0.82rem; color:#888" th:text="${scorRisc.factori}"></p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+        <h3>Acțiuni rapide</h3>
+        <a href="/pacient/consultatie" class="btn">+ Consultație nouă</a>
+        <a href="/pacient/istoric" class="btn btn-outline" style="margin-left:0.5rem">Istoricul meu</a>
+    </div>
+
+    <div class="card">
+        <h3>Ultimele fișe medicale</h3>
+        <table th:if="${!fiseRecente.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Data</th>
+                <th>Diagnostic provizoriu</th>
+                <th>Complexitate</th>
+                <th>Status</th>
+                <th>Programare</th>
+                <th>Doctor</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${fiseRecente}">
+                <td th:text="${f.created_at}"></td>
+                <td th:text="${f.provisional_diagnosis}"></td>
+                <td>
+                        <span class="badge"
+                              th:classappend="${f.complexity_level == 1} ? 'c1' :
+                                             (${f.complexity_level == 2} ? 'c2' : 'c3')"
+                              th:text="${f.complexity_level == 1} ? 'Simplu' :
+                                       (${f.complexity_level == 2} ? 'Mediu' : 'Urgent')">
+                        </span>
+                </td>
+                <td th:text="${f.status}"></td>
+                <td th:text="${f.scheduled_at != null} ? ${f.scheduled_at} : '-'"></td>
+                <td th:text="${f.doctor_name != null} ? ${f.doctor_name} : '-'"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${fiseRecente.isEmpty()}" style="color:#888">Nu ai fișe medicale încă.</p>
+    </div>
+</div>
+</body>
+</html>

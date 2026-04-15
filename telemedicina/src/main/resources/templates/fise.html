@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fișe Medicale</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #2c7be5; color: white;
+            padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold;
+        }
+        .navbar a { color: white; text-decoration: none; font-size: 0.9rem; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; background: white;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        th { background: #2c7be5; color: white; padding: 0.8rem 1rem; text-align: left; font-size: 0.9rem; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid #f0f4f8; font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8faff; }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .c1 { background: #e8f5e9; color: #2e7d32; }
+        .c2 { background: #fff8e1; color: #f57f17; }
+        .c3 { background: #fdecea; color: #c62828; }
+        .s-nou { background: #e3f2fd; color: #1565c0; }
+        .s-completat { background: #f3e5f5; color: #6a1b9a; }
+        .s-programat { background: #fff8e1; color: #f57f17; }
+        .s-inchis { background: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+<div class="navbar">Sistem de Telemedicină
+    <a href="/">← Dashboard</a>
+</div>
+
+<div class="container">
+    <h2>Fișe Medicale</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Pacient</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Complexitate</th>
+            <th>Diagnostic provizoriu</th>
+            <th>Doctor</th>
+            <th>Programare</th>
+            <th>Diagnostic confirmat</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="f : ${fise}">
+            <td th:text="${f.id}"></td>
+            <td th:text="${f.last_name} + ' ' + ${f.first_name}"></td>
+            <td th:text="${f.created_at}"></td>
+            <td>
+                    <span class="badge"
+                          th:classappend="${f.status == 'nou'} ? 's-nou' :
+                                         (${f.status == 'completat'} ? 's-completat' :
+                                         (${f.status == 'programat'} ? 's-programat' : 's-inchis'))"
+                          th:text="${f.status}">
+                    </span>
+            </td>
+            <td>
+                    <span class="badge"
+                          th:classappend="${f.complexity_level == 1} ? 'c1' :
+                                         (${f.complexity_level == 2} ? 'c2' : 'c3')"
+                          th:text="${f.complexity_level == 1} ? 'Simplu' :
+                                   (${f.complexity_level == 2} ? 'Mediu' : 'Urgent')">
+                    </span>
+            </td>
+            <td th:text="${f.provisional_diagnosis}"></td>
+            <td th:text="${f.doctor_first != null} ? ${f.doctor_last} + ' ' + ${f.doctor_first} : '-'"></td>
+            <td th:text="${f.scheduled_at != null} ? ${f.scheduled_at} : '-'"></td>
+            <td th:text="${f.confirmed_diagnosis != null} ? ${f.confirmed_diagnosis} : '-'"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

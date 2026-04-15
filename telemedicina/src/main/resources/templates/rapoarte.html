@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapoarte</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #1a5cbf; color: white;
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar-brand { font-size: 1.2rem; font-weight: bold; }
+        .navbar a { color: white; text-decoration: none; margin-left: 1rem; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        h3 { color: #1a5cbf; margin-bottom: 1rem; font-size: 1rem; }
+        .card {
+            background: white; border-radius: 12px;
+            padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .alert-warning {
+            background: #fff8e1; border-left: 4px solid #f9a825;
+            padding: 0.8rem 1rem; border-radius: 8px;
+            color: #e65100; margin-bottom: 1.5rem; font-size: 0.9rem;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1a5cbf; color: white; padding: 0.7rem 1rem; text-align: left; font-size: 0.85rem; }
+        td { padding: 0.7rem 1rem; border-bottom: 1px solid #f0f4f8; font-size: 0.85rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8faff; }
+        .sectiune-header td {
+            background: #e8f0fc; color: #1a5cbf;
+            font-weight: bold; font-size: 0.82rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .urgent { background: #fdecea; color: #c62828; }
+        .mediu { background: #fff8e1; color: #f57f17; }
+        .ok { background: #e8f5e9; color: #2e7d32; }
+        .empty-msg { color: #888; font-size: 0.9rem; padding: 0.5rem 0; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-brand">TeleMed - Portal Doctor</div>
+    <div>
+        <span th:text="${userName}"></span>
+        <a href="/doctor/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Rapoarte si statistici</h2>
+
+    <div class="alert-warning" th:if="${!alerte.isEmpty()}">
+        Atentie: <strong th:text="${alerte.size()}"></strong> pacienti au abonamentul care expira in urmatoarele 7 zile!
+    </div>
+
+    <div class="card" th:if="${!alerte.isEmpty()}">
+        <h3>- Alerte abonamente</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Pacient</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>Tip abonament</th>
+                <th>Expira la</th>
+                <th>Zile ramase</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${alerte}">
+                <td th:text="${a.patient_name}"></td>
+                <td th:text="${a.email}"></td>
+                <td th:text="${a.phone_number}"></td>
+                <td th:text="${a.subscription_type}"></td>
+                <td th:text="${a.end_date}"></td>
+                <td>
+                        <span class="badge"
+                              th:classappend="${a.zile_ramase <= 2} ? 'urgent' :
+                                             (${a.zile_ramase <= 5} ? 'mediu' : 'ok')"
+                              th:text="${a.zile_ramase} + ' zile'">
+                        </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>- Statistici generale</h3>
+        <table th:if="${!statistici.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Categorie</th>
+                <th>Detaliu</th>
+                <th>Valoare</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${statistici}">
+                <td th:text="${s.sectiune}"></td>
+                <td th:text="${s.nume}"></td>
+                <td th:text="${s.valoare}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="empty-msg" th:if="${statistici.isEmpty()}">Nu exista date disponibile.</p>
+    </div>
+</div>
+</body>
+</html>

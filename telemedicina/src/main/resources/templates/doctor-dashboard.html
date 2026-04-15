@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Doctor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #1a5cbf; color: white;
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar-brand { font-size: 1.2rem; font-weight: bold; }
+        .navbar a { color: white; text-decoration: none; margin-left: 1rem; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 0.5rem; }
+        h3 { color: #1a5cbf; margin-bottom: 1rem; font-size: 1rem; }
+        .card {
+            background: white; border-radius: 12px;
+            padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .alert-success {
+            background: #e8f5e9; border-left: 4px solid #43a047;
+            padding: 0.8rem; border-radius: 8px; color: #1b5e20;
+            margin-bottom: 1rem; font-size: 0.9rem;
+        }
+        .alert-error {
+            background: #fdecea; border-left: 4px solid #e53935;
+            padding: 0.8rem; border-radius: 8px; color: #b71c1c;
+            margin-bottom: 1rem; font-size: 0.9rem;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1a5cbf; color: white; padding: 0.7rem 1rem; text-align: left; font-size: 0.85rem; }
+        td { padding: 0.7rem 1rem; border-bottom: 1px solid #f0f4f8; font-size: 0.85rem; }
+        tr:hover td { background: #f8faff; }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .c1 { background: #e8f5e9; color: #2e7d32; }
+        .c2 { background: #fff8e1; color: #f57f17; }
+        .c3 { background: #fdecea; color: #c62828; }
+        .btn {
+            padding: 0.4rem 0.8rem; background: #1a5cbf; color: white;
+            border: none; border-radius: 6px; cursor: pointer; font-size: 0.82rem;
+        }
+        .btn:hover { background: #0d3a8c; }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; border-radius: 12px;
+            padding: 2rem; width: 100%; max-width: 550px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal h3 { margin-bottom: 1.5rem; color: #1a5cbf; }
+        label { display: block; color: #555; font-size: 0.85rem; margin-bottom: 0.3rem; }
+        input[type=text], textarea {
+            width: 100%; padding: 0.6rem; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 0.9rem; margin-bottom: 1rem;
+        }
+        textarea { height: 80px; resize: vertical; }
+        .modal-btns { display: flex; gap: 0.5rem; justify-content: flex-end; }
+        .btn-cancel {
+            padding: 0.5rem 1rem; background: #f5f5f5; color: #555;
+            border: none; border-radius: 6px; cursor: pointer;
+        }
+        .empty-msg { color: #888; font-size: 0.9rem; padding: 1rem 0; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-brand">TeleMed — Portal Doctor</div>
+    <div>
+        <span th:text="${userName}"></span>
+        <a href="/doctor/rapoarte">Rapoarte</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 th:text="'Bună ziua, Dr. ' + ${userName} + '!'"></h2>
+    <p style="color:#888; margin-bottom:1.5rem">Consultațiile tale de astăzi</p>
+
+    <div class="alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h3>Consultații programate azi</h3>
+        <table th:if="${!consultatiiAzi.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Ora</th>
+                <th>Pacient</th>
+                <th>Vârstă</th>
+                <th>Afecțiuni cronice</th>
+                <th>Simptome</th>
+                <th>Diagnostic provizoriu</th>
+                <th>Complexitate</th>
+                <th>Acțiune</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${consultatiiAzi}">
+                <td th:text="${c.scheduled_at}"></td>
+                <td th:text="${c.patient_name}"></td>
+                <td th:text="${c.patient_age} + ' ani'"></td>
+                <td th:text="${c.chronic_conditions}"></td>
+                <td th:text="${c.symptoms}"></td>
+                <td th:text="${c.provisional_diagnosis}"></td>
+                <td>
+                        <span class="badge"
+                              th:classappend="${c.complexity_level == 1} ? 'c1' :
+                                             (${c.complexity_level == 2} ? 'c2' : 'c3')"
+                              th:text="${c.complexity_level == 1} ? 'Simplu' :
+                                       (${c.complexity_level == 2} ? 'Mediu' : 'Urgent')">
+                        </span>
+                </td>
+                <td>
+                    <button class="btn"
+                            th:data-cons-id="${c.consultation_id}"
+                            th:data-diagnosis="${c.provisional_diagnosis}"
+                            onclick="deschideModal(this.dataset.consId, this.dataset.diagnosis)">
+                        Finalizeaza
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="empty-msg" th:if="${consultatiiAzi.isEmpty()}">Nu ai consultații programate pentru astăzi.</p>
+    </div>
+
+    <div class="card">
+        <h3>Consultații viitoare</h3>
+        <table th:if="${!consultatiiViitoare.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Data și ora</th>
+                <th>Pacient</th>
+                <th>Diagnostic provizoriu</th>
+                <th>Complexitate</th>
+                <th>Durată</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${consultatiiViitoare}">
+                <td th:text="${c.scheduled_at}"></td>
+                <td th:text="${c.patient_name}"></td>
+                <td th:text="${c.provisional_diagnosis}"></td>
+                <td>
+                        <span class="badge"
+                              th:classappend="${c.complexity_level == 1} ? 'c1' :
+                                             (${c.complexity_level == 2} ? 'c2' : 'c3')"
+                              th:text="${c.complexity_level == 1} ? 'Simplu' :
+                                       (${c.complexity_level == 2} ? 'Mediu' : 'Urgent')">
+                        </span>
+                </td>
+                <td th:text="${c.duration_minutes} + ' min'"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="empty-msg" th:if="${consultatiiViitoare.isEmpty()}">Nu ai consultații viitoare programate.</p>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal">
+        <h3>Finalizează consultația</h3>
+        <form th:action="@{/doctor/finalizeaza}" method="post">
+            <input type="hidden" name="consultationId" id="modal-cons-id"/>
+
+            <label>Diagnostic confirmat</label>
+            <input type="text" name="confirmedDiagnosis" id="modal-diagnosis" required/>
+
+            <label>Medicamente prescrise</label>
+            <textarea name="medications" required placeholder="ex: Paracetamol 500mg, 3x/zi, 5 zile"></textarea>
+
+            <label>Recomandări</label>
+            <textarea name="recommendations" placeholder="ex: Repaus la pat, hidratare abundenta"></textarea>
+
+            <div class="modal-btns">
+                <button type="button" class="btn-cancel" onclick="inchideModal()">Anulează</button>
+                <button type="submit" class="btn">Salvează și emite rețetă</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function deschideModal(consultationId, diagnosis) {
+        document.getElementById('modal-cons-id').value = consultationId;
+        document.getElementById('modal-diagnosis').value = diagnosis;
+        document.getElementById('modal').classList.add('active');
+    }
+    function inchideModal() {
+        document.getElementById('modal').classList.remove('active');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Istoricul meu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; }
+        .navbar {
+            background: #2c7be5; color: white;
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar-brand { font-size: 1.2rem; font-weight: bold; }
+        .navbar a { color: white; text-decoration: none; margin-left: 1rem; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        h3 { color: #2c7be5; margin-bottom: 1rem; font-size: 1rem; }
+        .card {
+            background: white; border-radius: 12px;
+            padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2c7be5; color: white; padding: 0.7rem 1rem; text-align: left; font-size: 0.85rem; }
+        td { padding: 0.7rem 1rem; border-bottom: 1px solid #f0f4f8; font-size: 0.85rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8faff; }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .c1 { background: #e8f5e9; color: #2e7d32; }
+        .c2 { background: #fff8e1; color: #f57f17; }
+        .c3 { background: #fdecea; color: #c62828; }
+        .activ { background: #e8f5e9; color: #2e7d32; }
+        .expirat { background: #fdecea; color: #c62828; }
+        .empty-msg { color: #888; font-size: 0.9rem; padding: 0.5rem 0; }
+        .btn {
+            display: inline-block; padding: 0.6rem 1.2rem;
+            background: #2c7be5; color: white; border-radius: 8px;
+            text-decoration: none; font-size: 0.9rem;
+        }
+        .btn:hover { background: #1a5cbf; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-brand">TeleMed</div>
+    <div>
+        <span th:text="${userName}"></span>
+        <a href="/pacient/dashboard">Dashboard</a>
+        <a href="/pacient/consultatie">Consultatie noua</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Istoricul meu medical</h2>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Afectiuni cronice</h3>
+            <table th:if="${!conditiiCronice.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Afectiune</th>
+                    <th>Data diagnosticului</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${conditiiCronice}">
+                    <td th:text="${c.name}"></td>
+                    <td th:text="${c.diagnosed_date}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty-msg" th:if="${conditiiCronice.isEmpty()}">Nicio afectiune cronica inregistrata.</p>
+        </div>
+
+        <div class="card">
+            <h3>Abonamente</h3>
+            <table th:if="${!abonamente.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Tip</th>
+                    <th>Valabil pana la</th>
+                    <th>Cost</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${abonamente}">
+                    <td th:text="${a.type}"></td>
+                    <td th:text="${a.end_date}"></td>
+                    <td th:text="${a.cost} + ' RON'"></td>
+                    <td>
+                            <span class="badge"
+                                  th:classappend="${a.status == 'activ'} ? 'activ' : 'expirat'"
+                                  th:text="${a.status}">
+                            </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty-msg" th:if="${abonamente.isEmpty()}">Niciun abonament inregistrat.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Fise medicale si consultatii</h3>
+        <table th:if="${!istoric.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Data</th>
+                <th>Simptome</th>
+                <th>Diagnostic provizoriu</th>
+                <th>Complexitate</th>
+                <th>Status</th>
+                <th>Doctor</th>
+                <th>Programare</th>
+                <th>Diagnostic confirmat</th>
+                <th>Medicamente</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${istoric}">
+                <td th:text="${f.form_date}"></td>
+                <td th:text="${f.symptom1 != null ? f.symptom1 : ''} +
+                                 ${f.symptom2 != null ? ', ' + f.symptom2 : ''} +
+                                 ${f.symptom3 != null ? ', ' + f.symptom3 : ''}">
+                </td>
+                <td th:text="${f.provisional_diagnosis}"></td>
+                <td>
+                        <span class="badge"
+                              th:classappend="${f.complexity_level == 1} ? 'c1' :
+                                             (${f.complexity_level == 2} ? 'c2' : 'c3')"
+                              th:text="${f.complexity_level == 1} ? 'Simplu' :
+                                       (${f.complexity_level == 2} ? 'Mediu' : 'Urgent')">
+                        </span>
+                </td>
+                <td th:text="${f.form_status}"></td>
+                <td th:text="${f.doctor_name != null} ? ${f.doctor_name} : '-'"></td>
+                <td th:text="${f.consultation_date != null} ? ${f.consultation_date} : '-'"></td>
+                <td th:text="${f.confirmed_diagnosis != null} ? ${f.confirmed_diagnosis} : '-'"></td>
+                <td th:text="${f.medications != null} ? ${f.medications} : '-'"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="empty-msg" th:if="${istoric.isEmpty()}">Nu ai fise medicale inregistrate.</p>
+        <a href="/pacient/consultatie" class="btn" style="margin-top:1rem">+ Consultatie noua</a>
+    </div>
+</div>
+</body>
+</html>
