@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inregistrare - TeleMed</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a5cbf 0%, #2c7be5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .logo { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; }
+        h2 { text-align: center; color: #2c7be5; margin-bottom: 0.3rem; }
+        .subtitle { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        label { display: block; color: #555; font-size: 0.85rem; margin-bottom: 0.3rem; }
+        input {
+            width: 100%; padding: 0.7rem; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 0.95rem; margin-bottom: 1rem;
+        }
+        input:focus { outline: none; border-color: #2c7be5; }
+        button[type=submit] {
+            width: 100%; padding: 0.8rem; background: #2c7be5;
+            color: white; border: none; border-radius: 8px;
+            font-size: 1rem; cursor: pointer; margin-top: 0.5rem;
+        }
+        button[type=submit]:hover { background: #1a5cbf; }
+        .alert-error {
+            background: #fdecea; border-left: 4px solid #e53935;
+            padding: 0.8rem; border-radius: 8px; color: #b71c1c;
+            margin-bottom: 1rem; font-size: 0.9rem;
+        }
+        .alert-success {
+            background: #e8f5e9; border-left: 4px solid #43a047;
+            padding: 0.8rem; border-radius: 8px; color: #1b5e20;
+            margin-bottom: 1rem; font-size: 0.9rem;
+        }
+        .login-link {
+            text-align: center; margin-top: 1.5rem;
+            font-size: 0.9rem; color: #888;
+        }
+        .login-link a { color: #2c7be5; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">TeleMed</div>
+    <h2>Creeaza cont</h2>
+    <p class="subtitle">Inregistrare pacient nou</p>
+
+    <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+    <div class="alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <form th:action="@{/register}" method="post">
+        <div class="grid-2">
+            <div>
+                <label>Prenume</label>
+                <input type="text" name="firstName" required placeholder="Ion"/>
+            </div>
+            <div>
+                <label>Nume</label>
+                <input type="text" name="lastName" required placeholder="Popescu"/>
+            </div>
+        </div>
+
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="ion.popescu@gmail.com"/>
+
+        <label>Parola</label>
+        <input type="password" name="password" id="password" required placeholder="minimum 6 caractere"/>
+
+        <label>Confirma parola</label>
+        <input type="password" name="confirmPassword" id="confirmPassword" required placeholder="repeta parola"/>
+
+        <div class="grid-2">
+            <div>
+                <label>Data nasterii</label>
+                <input type="date" name="birthDate" required th:max="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"/>
+            </div>
+            <div>
+                <label>Telefon</label>
+                <input type="text" name="phoneNumber" required placeholder="07xxxxxxxx"/>
+            </div>
+        </div>
+
+        <label>Adresa</label>
+        <input type="text" name="address" placeholder="Str. Exemplu nr. 1, Iasi"/>
+
+        <button type="submit">Creeaza cont</button>
+    </form>
+
+    <div class="login-link">
+        Ai deja cont? <a href="/login">Autentifica-te</a>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('Parola trebuie sa aiba minimum 6 caractere.');
+            return;
+        }
+
+        if (password !== confirm) {
+            e.preventDefault();
+            alert('Parolele nu coincid.');
+            return;
+        }
+    });
+</script>
+</body>
+</html>

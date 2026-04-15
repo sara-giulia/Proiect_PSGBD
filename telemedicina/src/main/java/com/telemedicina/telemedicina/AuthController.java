@@ -59,4 +59,60 @@ public class AuthController {
         session.invalidate();
         return "redirect:/login";
     }
+
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestParam String firstName, @RequestParam String lastName,
+            @RequestParam String email, @RequestParam String password,
+            @RequestParam String birthDate, @RequestParam String phoneNumber,
+            @RequestParam String address, @RequestParam String confirmPassword,
+            HttpSession session,RedirectAttributes redirectAttrs) {
+
+        try {
+            int count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM PATIENT WHERE email = ?",
+                    Integer.class, email);
+
+            if (count > 0) {
+                redirectAttrs.addFlashAttribute("error", "Exista deja un cont cu acest email.");
+                return "redirect:/register";
+            }
+
+            if (password.length() < 6) {
+                redirectAttrs.addFlashAttribute("error", "Parola trebuie sa aiba minimum 6 caractere.");
+                return "redirect:/register";
+            }
+
+            java.time.LocalDate birth = java.time.LocalDate.parse(birthDate);
+            if (birth.isAfter(java.time.LocalDate.now())) {
+                redirectAttrs.addFlashAttribute("error", "Data nasterii nu poate fi in viitor.");
+                return "redirect:/register";
+            }
+
+            jdbcTemplate.update(
+                    "INSERT INTO PATIENT (first_name, last_name, birth_date, phone_number, email, password, address) " +
+                            "VALUES (?, ?, ?::DATE, ?, ?, ?, ?)",
+                    firstName, lastName, birthDate, phoneNumber, email, password, address
+            );
+
+            Map<String, Object> newPatient = jdbcTemplate.queryForMap(
+                    "SELECT id, first_name, last_name, email FROM PATIENT WHERE email = ?", email
+            );
+
+            session.setAttribute("userId", newPatient.get("id"));
+            session.setAttribute("userName", newPatient.get("first_name") + " " + newPatient.get("last_name"));
+            session.setAttribute("userEmail", newPatient.get("email"));
+            session.setAttribute("userRole", "pacient");
+
+            return "redirect:/pacient/dashboard";
+
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", "Eroare la inregistrare: " + e.getMessage());
+            return "redirect:/register";
+        }
+    }
 }

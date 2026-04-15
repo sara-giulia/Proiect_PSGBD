@@ -53,23 +53,23 @@ public class DoctorDashboardController {
     }
 
     @PostMapping("/finalizeaza")
-    public String finalizeaza(
-            @RequestParam int consultationId,
-            @RequestParam String confirmedDiagnosis,
-            @RequestParam String medications,
-            @RequestParam String recommendations,
-            HttpSession session,
-            RedirectAttributes redirectAttrs) {
+    public String finalizeaza(@RequestParam int consultationId, @RequestParam String confirmedDiagnosis,
+            @RequestParam String medications, @RequestParam String recommendations,
+            @RequestParam(required = false) String referralType, @RequestParam(required = false) String referralDetails,
+            HttpSession session, RedirectAttributes redirectAttrs) {
 
-        if (session.getAttribute("userRole") == null || !session.getAttribute("userRole").equals("doctor")) {
+        if (session.getAttribute("userRole") == null ||
+                !session.getAttribute("userRole").equals("doctor")) {
             return "redirect:/login";
         }
 
         try {
             jdbcTemplate.update(
                     "UPDATE CONSULTATION SET status = 'finalizata', " +
-                            "confirmed_diagnosis = ?, notes = ? WHERE id = ?",
-                    confirmedDiagnosis, recommendations, consultationId);
+                            "confirmed_diagnosis = ?, notes = ?, " +
+                            "referral_type = ?, referral_details = ? WHERE id = ?",
+                    confirmedDiagnosis, recommendations,
+                    referralType, referralDetails, consultationId);
 
             jdbcTemplate.update(
                     "INSERT INTO PRESCRIPTION (consultation_id, issued_at, medications, recommendations) " +
@@ -77,7 +77,7 @@ public class DoctorDashboardController {
                             "SET medications = EXCLUDED.medications, recommendations = EXCLUDED.recommendations",
                     consultationId, medications, recommendations);
 
-            redirectAttrs.addFlashAttribute("success", "Consultația a fost finalizată și rețeta emisă.");
+            redirectAttrs.addFlashAttribute("success", "Consultatia a fost finalizata si reteta emisa.");
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("error", "Eroare la finalizare: " + e.getMessage());
         }

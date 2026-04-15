@@ -118,20 +118,35 @@ public class ConsultatieController {
                 Map<String, Object> result = jdbcTemplate.queryForMap(
                         "SELECT * FROM schedule_wrapper(?, ?)", formId, complexity);
 
+                int consultationId = ((Number) result.get("p_consultation_id")).intValue();
                 int doctorId = ((Number) result.get("p_doctor_id")).intValue();
 
-                Map<String, Object> doctor = jdbcTemplate.queryForMap(
-                        "SELECT first_name, last_name, specialization FROM DOCTOR WHERE id = ?", doctorId);
+                boolean inListaAsteptare = jdbcTemplate.queryForObject(
+                        "SELECT waiting_list FROM CONSULTATION WHERE id = ?",
+                        Boolean.class, consultationId
+                );
 
-                redirectAttrs.addFlashAttribute("doctorNume",
-                        "Dr. " + doctor.get("last_name") + " " + doctor.get("first_name") +
-                                " (" + doctor.get("specialization") + ")");
-                redirectAttrs.addFlashAttribute("scheduledAt",
-                        new java.sql.Timestamp(
-                                ((java.sql.Timestamp) result.get("p_scheduled_at")).getTime()
-                        ).toLocalDateTime().format(
-                                java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
-                redirectAttrs.addFlashAttribute("programat", true);
+                if (inListaAsteptare) {
+                    redirectAttrs.addFlashAttribute("inListaAsteptare", true);
+                    redirectAttrs.addFlashAttribute("programat", true);
+                } else {
+                    Map<String, Object> doctor = jdbcTemplate.queryForMap(
+                            "SELECT first_name, last_name, specialization FROM DOCTOR WHERE id = ?", doctorId
+                    );
+                    redirectAttrs.addFlashAttribute("doctorNume",
+                            "Dr. " + doctor.get("last_name") + " " + doctor.get("first_name") +
+                                    " (" + doctor.get("specialization") + ")");
+                    Object scheduledAtObj = result.get("p_scheduled_at");
+                    if (scheduledAtObj != null) {
+                        redirectAttrs.addFlashAttribute("scheduledAt",
+                                new java.sql.Timestamp(
+                                        ((java.sql.Timestamp) scheduledAtObj).getTime()
+                                ).toLocalDateTime().format(
+                                        java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+                                ));
+                    }
+                    redirectAttrs.addFlashAttribute("programat", true);
+                }
             }
 
         } catch (Exception e) {

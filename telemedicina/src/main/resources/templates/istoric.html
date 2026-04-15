@@ -119,6 +119,8 @@
                 <th>Programare</th>
                 <th>Diagnostic confirmat</th>
                 <th>Medicamente</th>
+                <th>Trimitere</th>
+                <th>Detalii trimitere</th>
             </tr>
             </thead>
             <tbody>
@@ -142,6 +144,8 @@
                 <td th:text="${f.consultation_date != null} ? ${f.consultation_date} : '-'"></td>
                 <td th:text="${f.confirmed_diagnosis != null} ? ${f.confirmed_diagnosis} : '-'"></td>
                 <td th:text="${f.medications != null} ? ${f.medications} : '-'"></td>
+                <td th:text="${f.referral_type != null} ? ${f.referral_type} : '-'"></td>
+                <td th:text="${f.referral_details != null} ? ${f.referral_details} : '-'"></td>
             </tr>
             </tbody>
         </table>

@@ -15,7 +15,9 @@ CREATE OR REPLACE FUNCTION schedule_wrapper(p_form_id INT, p_complexity INT)
 RETURNS TABLE(p_consultation_id INT, p_doctor_id INT, p_scheduled_at TIMESTAMP)
 LANGUAGE plpgsql AS $$
 DECLARE
-    v_cons_id INT; v_doctor_id INT; v_scheduled TIMESTAMP;
+    v_cons_id INT;
+    v_doctor_id INT;
+    v_scheduled TIMESTAMP;
 BEGIN
     CALL scheduleaza_consultatie(p_form_id, p_complexity,
         v_cons_id, v_doctor_id, v_scheduled);

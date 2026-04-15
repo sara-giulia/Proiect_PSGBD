@@ -186,6 +186,17 @@
                 <button type="submit" class="btn">Salvează și emite rețetă</button>
             </div>
         </form>
+
+        <label>Trimitere</label>
+        <select name="referralType" style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; font-size:0.9rem; margin-bottom:1rem;">
+            <option value="">Fara trimitere</option>
+            <option value="spital">Trimitere la spital</option>
+            <option value="investigatii">Investigatii suplimentare</option>
+            <option value="specialist">Trimitere la specialist</option>
+        </select>
+
+        <label>Detalii trimitere</label>
+        <textarea name="referralDetails" placeholder="ex: Trimitere la urgente pentru investigatii CT"></textarea>
     </div>
 </div>
 

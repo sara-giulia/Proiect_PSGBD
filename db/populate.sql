@@ -63,6 +63,16 @@ DECLARE
     lista_raspunsuri TEXT[] := ARRAY[
         'da','nu','3 zile','2 zile','1 saptamana','Paracetamol','nu am luat nimic','da, s-au agravat'
     ];
+    lista_referral_type TEXT[] := ARRAY[
+        'spital','investigatii','specialist'
+    ];
+    lista_referral_details TEXT[] := ARRAY[
+        'Trimitere la urgente pentru evaluare suplimentara.',
+        'Investigatii CT recomandate.',
+        'Trimitere la specialist cardiolog.',
+        'Analize de sange complete recomandate.',
+        'Trimitere la specialist neurolog.'
+    ];
 
     v_nume TEXT;
     v_prenume TEXT;
@@ -85,25 +95,26 @@ DECLARE
     v_symptom1 TEXT;
     v_symptom2 TEXT;
     v_symptom3 TEXT;
+    v_password TEXT;
     v_i INT;
 
 BEGIN
     INSERT INTO DOCTOR (first_name, last_name, email, password, specialization, schedule_start, schedule_end) VALUES
-        ('Andrei', 'Popescu', 'andrei.popescu@telemedicina.ro', 'doctor123', 'Medicina generala', '08:00', '13:00'),
-        ('Maria', 'Ionescu', 'maria.ionescu@telemedicina.ro', 'doctor123', 'Pediatrie', '11:00', '17:00'),
-        ('Cristian', 'Gheorghe', 'cristian.gheorghe@telemedicina.ro', 'doctor123', 'Cardiologie', '14:00', '19:00'),
-        ('Elena', 'Constantin', 'elena.constantin@telemedicina.ro', 'doctor123', 'Neurologie', '08:00', '14:00'),
-        ('Bogdan', 'Rusu', 'bogdan.rusu@telemedicina.ro', 'doctor123', 'Dermatologie', '10:00', '16:00'),
-        ('Ioana', 'Matei', 'ioana.matei@telemedicina.ro', 'doctor123', 'Gastroenterologie', '13:00', '19:00'),
-        ('Mihai', 'Dinu', 'mihai.dinu@telemedicina.ro', 'doctor123', 'Medicina generala', '07:00', '12:00'),
-        ('Raluca', 'Stoica', 'raluca.stoica@telemedicina.ro', 'doctor123', 'Pediatrie', '09:00', '15:00'),
-        ('Tudor', 'Marin', 'tudor.marin@telemedicina.ro', 'doctor123', 'Cardiologie', '15:00', '20:00'),
-        ('Simona', 'Vlad', 'simona.vlad@telemedicina.ro', 'doctor123', 'Neurologie', '12:00', '18:00'),
-        ('Catalin', 'Oprea', 'catalin.oprea@telemedicina.ro', 'doctor123', 'Dermatologie', '08:00', '14:00'),
-        ('Andreea', 'Lungu', 'andreea.lungu@telemedicina.ro', 'doctor123', 'Gastroenterologie', '10:00', '17:00'),
-        ('Dan', 'Chiriac', 'dan.chiriac@telemedicina.ro', 'doctor123', 'Medicina generala', '06:00', '12:00'),
-        ('Gabriela', 'Serban', 'gabriela.serban@telemedicina.ro', 'doctor123', 'Oncologie', '09:00', '16:00'),
-        ('Razvan', 'Moldovan', 'razvan.moldovan@telemedicina.ro', 'doctor123', 'Ortopedie', '13:00', '20:00');
+        ('Andrei', 'Popescu', 'andrei.popescu@telemedicina.ro', 'Andrei123', 'Medicina generala', '08:00', '13:00'),
+        ('Maria', 'Ionescu', 'maria.ionescu@telemedicina.ro', 'Maria123', 'Pediatrie', '11:00', '17:00'),
+        ('Cristian', 'Gheorghe', 'cristian.gheorghe@telemedicina.ro', 'Cristian123', 'Cardiologie', '14:00', '19:00'),
+        ('Elena', 'Constantin', 'elena.constantin@telemedicina.ro', 'Elena123', 'Neurologie', '08:00', '14:00'),
+        ('Bogdan', 'Rusu', 'bogdan.rusu@telemedicina.ro', 'Bogdan123', 'Dermatologie', '10:00', '16:00'),
+        ('Ioana', 'Matei', 'ioana.matei@telemedicina.ro', 'Ioana123', 'Gastroenterologie', '13:00', '19:00'),
+        ('Mihai', 'Dinu', 'mihai.dinu@telemedicina.ro', 'Mihai123', 'Medicina generala', '07:00', '12:00'),
+        ('Raluca', 'Stoica', 'raluca.stoica@telemedicina.ro', 'Raluca123', 'Pediatrie', '09:00', '15:00'),
+        ('Tudor', 'Marin', 'tudor.marin@telemedicina.ro', 'Tudor123', 'Cardiologie', '15:00', '20:00'),
+        ('Simona', 'Vlad', 'simona.vlad@telemedicina.ro', 'Simona123', 'Neurologie', '12:00', '18:00'),
+        ('Catalin', 'Oprea', 'catalin.oprea@telemedicina.ro', 'Catalin123', 'Dermatologie', '08:00', '14:00'),
+        ('Andreea', 'Lungu', 'andreea.lungu@telemedicina.ro', 'Andreea123', 'Gastroenterologie', '10:00', '17:00'),
+        ('Dan', 'Chiriac', 'dan.chiriac@telemedicina.ro', 'Dan123', 'Medicina generala', '06:00', '12:00'),
+        ('Gabriela', 'Serban', 'gabriela.serban@telemedicina.ro', 'Gabriela123', 'Oncologie', '09:00', '16:00'),
+        ('Razvan', 'Moldovan', 'razvan.moldovan@telemedicina.ro', 'Razvan123', 'Ortopedie', '13:00', '20:00');
 
     FOR v_i IN 1..20 LOOP
         v_nume := lista_nume[FLOOR(RANDOM() * array_length(lista_nume, 1)) + 1];
@@ -122,10 +133,11 @@ BEGIN
         END LOOP;
         v_email := v_email || '@gmail.com';
 
+        v_password := v_prenume || '123';
         v_birth_date := CURRENT_DATE - (FLOOR(RANDOM() * 365 * 35) + 365 * 25)::INT;
 
         INSERT INTO PATIENT (first_name, last_name, birth_date, phone_number, email, password, address)
-        VALUES (v_prenume, v_nume, v_birth_date, '07' || FLOOR(RANDOM() * 90000000 + 10000000)::TEXT, v_email, 'parola123',
+        VALUES (v_prenume, v_nume, v_birth_date, '07' || FLOOR(RANDOM() * 90000000 + 10000000)::TEXT, v_email, v_password,
             'Str. ' || lista_nume[FLOOR(RANDOM() * array_length(lista_nume, 1)) + 1] || ' nr. ' || FLOOR(RANDOM() * 50 + 1)::TEXT);
     END LOOP;
 
@@ -136,11 +148,11 @@ BEGIN
         SELECT last_name INTO v_nume FROM PATIENT WHERE id = v_tutor_id;
 
         v_email := LOWER(v_prenume || '.junior.' || v_nume || v_i::TEXT || '@gmail.com');
-
+        v_password := v_prenume || '123';
         v_birth_date := CURRENT_DATE - (FLOOR(RANDOM() * 365 * 14) + 365 * 3)::INT;
 
         INSERT INTO PATIENT (first_name, last_name, birth_date, phone_number, email, password, address, tutor_id)
-        VALUES (v_prenume, v_nume, v_birth_date, '07' || FLOOR(RANDOM() * 90000000 + 10000000)::TEXT, v_email, 'parola123',
+        VALUES (v_prenume, v_nume, v_birth_date, '07' || FLOOR(RANDOM() * 90000000 + 10000000)::TEXT, v_email, v_password,
             (SELECT address FROM PATIENT WHERE id = v_tutor_id), v_tutor_id);
     END LOOP;
 
@@ -233,14 +245,15 @@ BEGIN
         v_scheduled_at := NOW() + (FLOOR(RANDOM() * 14))::INT * INTERVAL '1 day';
         v_scheduled_at := DATE_TRUNC('hour', v_scheduled_at) + INTERVAL '9 hours';
 
-        INSERT INTO CONSULTATION (form_id, doctor_id, scheduled_at, duration_minutes, status, confirmed_diagnosis)
+        INSERT INTO CONSULTATION (form_id, doctor_id, scheduled_at, duration_minutes, status, confirmed_diagnosis, waiting_list)
         VALUES (v_form_id, v_doctor_id, v_scheduled_at, v_duration,
             CASE WHEN RANDOM() > 0.4 THEN 'finalizata' ELSE 'programata' END,
             CASE v_complexity
                 WHEN 1 THEN 'Viroza usoara confirmata'
                 WHEN 2 THEN 'Gripa sezoniera confirmata'
                 WHEN 3 THEN 'Caz complex - trimitere investigatii'
-            END
+            END,
+            FALSE
         )
         RETURNING id INTO v_cons_id;
     END LOOP;
@@ -251,6 +264,13 @@ BEGIN
             VALUES (v_cons_id, NOW() - (FLOOR(RANDOM() * 10))::INT * INTERVAL '1 day',
                 lista_medicamente[FLOOR(RANDOM() * array_length(lista_medicamente, 1)) + 1],
                 lista_recomandari[FLOOR(RANDOM() * array_length(lista_recomandari, 1)) + 1]);
+        END IF;
+
+        IF RANDOM() > 0.7 THEN
+            UPDATE CONSULTATION
+            SET referral_type = lista_referral_type[FLOOR(RANDOM() * array_length(lista_referral_type, 1)) + 1],
+                referral_details = lista_referral_details[FLOOR(RANDOM() * array_length(lista_referral_details, 1)) + 1]
+            WHERE id = v_cons_id;
         END IF;
     END LOOP;
 

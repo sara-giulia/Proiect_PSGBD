@@ -28,14 +28,14 @@ public class IstoricController {
         model.addAttribute("userName", session.getAttribute("userName"));
 
         List<Map<String, Object>> istoric = jdbcTemplate.queryForList(
-                "SELECT form_id, " +
-                        "TO_CHAR(form_date, 'DD.MM.YYYY HH24:MI') AS form_date, " +
-                        "symptom1, symptom2, symptom3, " +
-                        "provisional_diagnosis, complexity_level, form_status, " +
-                        "TO_CHAR(consultation_date, 'DD.MM.YYYY HH24:MI') AS consultation_date, " +
-                        "doctor_name, confirmed_diagnosis, medications, recommendations " +
-                        "FROM get_istoric_pacient(?)", patientId
-        );
+                "SELECT f.form_id, f.form_date, f.symptom1, f.symptom2, f.symptom3, " +
+                        "f.provisional_diagnosis, f.complexity_level, f.form_status, " +
+                        "f.consultation_date, f.doctor_name, f.confirmed_diagnosis, " +
+                        "f.medications, f.recommendations, " +
+                        "c.referral_type, c.referral_details " +
+                        "FROM get_istoric_pacient(?) f " +
+                        "LEFT JOIN CONSULTATION c ON c.form_id = f.form_id " +
+                        "ORDER BY f.form_date DESC", patientId);
         model.addAttribute("istoric", istoric);
 
         List<Map<String, Object>> conditiiCronice = jdbcTemplate.queryForList(

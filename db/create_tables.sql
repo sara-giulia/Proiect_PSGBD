@@ -125,6 +125,9 @@ CREATE TABLE CONSULTATION (
 	status VARCHAR(20) NOT NULL DEFAULT 'programata',
 	confirmed_diagnosis TEXT,
 	notes TEXT,
+	referral_type VARCHAR(50),
+	referral_details TEXT,
+	waiting_list BOOLEAN DEFAULT FALSE,
 
 	CONSTRAINT fk_cons_form FOREIGN KEY (form_id) REFERENCES MEDICAL_FORM(id) ON DELETE CASCADE,
 	CONSTRAINT fk_cons_doctor FOREIGN KEY (doctor_id) REFERENCES DOCTOR(id) ON DELETE RESTRICT,

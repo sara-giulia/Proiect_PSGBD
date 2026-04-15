@@ -178,14 +178,24 @@
     </div>
 
     <div class="card" th:if="${#bools.isTrue(programat)}">
-    <h3>Consultatie programata cu succes</h3>
-        <div class="alert-success">
-            Ai fost programat la o consultatie cu un medic. Te vom astepta la data si ora de mai jos.
+        <h3>Consultatie programata cu succes</h3>
+
+        <div th:if="${#bools.isTrue(inListaAsteptare)}"
+             style="background:#fff8e1; border-left:4px solid #f9a825; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+            <strong>Ai fost adaugat in lista de asteptare.</strong>
+            Nu exista niciun slot disponibil in urmatoarele 14 zile. Vei fi contactat cand un slot devine disponibil.
         </div>
-        <div class="reteta-box">
+
+        <div th:if="${!#bools.isTrue(inListaAsteptare)}"
+             style="background:#e8f5e9; border-left:4px solid #43a047; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+            Ai fost programat la o consultatie cu un medic.
+        </div>
+
+        <div class="reteta-box" th:if="${!#bools.isTrue(inListaAsteptare)}">
             <p><span class="reteta-label">Doctor:</span> <span th:text="${doctorNume}"></span></p>
             <p><span class="reteta-label">Data si ora:</span> <span th:text="${scheduledAt}"></span></p>
         </div>
+
         <a href="/pacient/consultatie" class="btn btn-secondary" style="margin-top:1rem">Consultatie noua</a>
         <a href="/pacient/dashboard" class="btn" style="margin-top:0.5rem">Inapoi la dashboard</a>
     </div>
