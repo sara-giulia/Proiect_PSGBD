@@ -138,6 +138,20 @@
             </div>
         </div>
 
+        <div th:if="${complexity == 3}"
+             style="background:#fdecea; border-left:4px solid #c62828; padding:1.2rem; border-radius:8px; margin-top:1rem;">
+            <strong style="color:#c62828; font-size:1rem;">ATENTIE - Caz de urgenta potentiala</strong>
+            <p style="margin-top:0.5rem; color:#b71c1c; font-size:0.9rem;">
+                Pe baza simptomelor declarate, cazul tau necesita evaluare medicala urgenta.
+                Daca simptomele sunt severe, te rugam sa te prezinti imediat la camera de garda
+                sau sa suni la numarul de urgenta <strong>112</strong>.
+            </p>
+            <p style="margin-top:0.5rem; color:#b71c1c; font-size:0.88rem;">
+                Daca consideri ca situatia nu este critica, poti continua completarea fisei
+                pentru a fi programat prioritar la un medic.
+            </p>
+        </div>
+
         <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #eee"/>
 
         <h3>Raspundeti la urmatoarele intrebari</h3>
@@ -189,6 +203,15 @@
         <div th:if="${!#bools.isTrue(inListaAsteptare)}"
              style="background:#e8f5e9; border-left:4px solid #43a047; padding:1rem; border-radius:8px; margin-bottom:1rem;">
             Ai fost programat la o consultatie cu un medic.
+        </div>
+
+        <div th:if="${complexity == 3 and !#bools.isTrue(inListaAsteptare)}"
+             style="background:#fdecea; border-left:4px solid #c62828; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+            <strong style="color:#c62828;">Caz prioritar</strong>
+            <p style="color:#b71c1c; font-size:0.88rem; margin-top:0.3rem;">
+                Ai fost programat prioritar. Daca starea ta se agraveaza inainte de consultatie,
+                prezinta-te la camera de garda sau suna la <strong>112</strong>.
+            </p>
         </div>
 
         <div class="reteta-box" th:if="${!#bools.isTrue(inListaAsteptare)}">
